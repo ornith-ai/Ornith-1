@@ -169,8 +169,10 @@ Both generations are **MIT licensed, globally accessible, and free from regional
 > - **vLLM** ≥ 0.19.1
 > - **SGLang** ≥ 0.5.9
 >
-> Recommended sampling parameters: `temperature=0.6`, `top_p=0.95`, `top_k=20` (use `temperature=1.0` to reproduce the reported benchmark setup).
-
+> Recommended sampling parameters:
+>
+> - **For general tasks:** `temperature=1.0`, `top_p=0.95`, `top_k=20`, `min_p=0.0`, `presence_penalty=1.5`, `repetition_penalty=1.0`
+> - **For precise coding tasks:** `temperature=0.6`, `top_p=0.95`, `top_k=20`, `min_p=0.0`, `presence_penalty=0.0`, `repetition_penalty=1.0`
 
 ### Serving Ornith
 
@@ -183,11 +185,13 @@ Both generations ship as a dense **9B** model plus two **Mixture-of-Experts** mo
 | [Ornith-1.5-9B](https://huggingface.co/ornith-ai/Ornith-1.5-9B) | Dense (~9B) | bf16 | Single-GPU serving & fine-tuning |
 | [Ornith-1.5-9B-GGUF](https://huggingface.co/ornith-ai/Ornith-1.5-9B-GGUF) | Dense (~9B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
 | [Ornith-1.5-9B-MLX](https://huggingface.co/ornith-ai/Ornith-1.5-9B-MLX) | Dense (~9B) | MLX | Local inference on Apple Silicon |
+| Ornith-1.5-9B-MLX ([4bit](https://huggingface.co/ornith-ai/Ornith-1.5-9B-MLX-4bit) / [6bit](https://huggingface.co/ornith-ai/Ornith-1.5-9B-MLX-6bit) / [8bit](https://huggingface.co/ornith-ai/Ornith-1.5-9B-MLX-8bit)) | Dense (~9B) | MLX (quantized) | Local inference on Apple Silicon via MLX |
 | [Ornith-1.5-35B-A3B](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B) | MoE (35B-A3B) | bf16 | Full-precision multi-GPU serving |
 | [Ornith-1.5-35B-A3B-FP8](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-FP8) | MoE (35B-A3B) | FP8 | ~Half the VRAM on FP8-capable GPUs |
 | [Ornith-1.5-35B-A3B-NVFP4](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-NVFP4) | MoE (35B-A3B) | NVFP4 | 4-bit serving on NVIDIA Blackwell GPUs |
 | [Ornith-1.5-35B-A3B-GGUF](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-GGUF) | MoE (35B-A3B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
 | [Ornith-1.5-35B-A3B-MLX](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-MLX) | MoE (35B-A3B) | MLX | Local inference on Apple Silicon |
+| Ornith-1.5-35B-A3B-MLX ([4bit](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-MLX-4bit) / [6bit](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-MLX-6bit) / [8bit](https://huggingface.co/ornith-ai/Ornith-1.5-35B-A3B-MLX-8bit)) | MoE (35B-A3B) | MLX (quantized) | Local inference on Apple Silicon via MLX |
 | [Ornith-1.5-397B](https://huggingface.co/ornith-ai/Ornith-1.5-397B) | MoE (397B) | bf16 | Full-precision serving on a multi-GPU node |
 | [Ornith-1.5-397B-FP8](https://huggingface.co/ornith-ai/Ornith-1.5-397B-FP8) | MoE (397B) | FP8 | Memory-efficient serving on FP8-capable GPUs |
 | [Ornith-1.5-397B-NVFP4](https://huggingface.co/ornith-ai/Ornith-1.5-397B-NVFP4) | MoE (397B) | NVFP4 | 4-bit serving on NVIDIA Blackwell GPUs |
@@ -245,58 +249,42 @@ python -m sglang.launch_server \
     --reasoning-parser qwen3
 ```
 
-#### Hugging Face Transformers
+#### For Long-Context
 
-For a quick local test (or to script offline generation), load the model directly with Transformers. Make sure you have a recent release installed — see the [Transformers installation guide](https://huggingface.co/docs/transformers/installation); Ornith requires `transformers >= 5.8.1`. The dense 9B checkpoint is the easiest to run locally.
+Ornith-1.5-9B handles context windows of up to 262,144 tokens. When a task's combined input and output must go beyond this limit, we suggest extending the effective window with RoPE scaling — YaRN is the technique we validate against, and it is already built into both vLLM and SGLang. With a scaling factor of 4.0, the usable window grows to roughly 1M tokens.
 
-```python
-from transformers import AutoModelForCausalLM, AutoTokenizer
+You can turn YaRN on in either of two ways:
 
-model_name = "deepreinforce-ai/Ornith-1.5-9B"  # or -35B / -397B, or Ornith-1.0-*
+- **Edit the checkpoint's `config.json`.** Add a `rope_scaling` block to the model configuration:
 
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    dtype="auto",
-    device_map="auto",
-)
+  ```json
+  {
+      "rope_scaling": {
+          "rope_type": "yarn",
+          "factor": 4.0,
+          "original_max_position_embeddings": 262144
+      }
+  }
+  ```
 
-messages = [
-    {"role": "user", "content": "Write a Python function is_prime(n). Keep it short."}
-]
-text = tokenizer.apply_chat_template(
-    messages,
-    tokenize=False,
-    add_generation_prompt=True,
-)
+- **Override at launch time.** Leave the checkpoint untouched and extend the serve commands above with the equivalent flags.
 
-inputs = tokenizer(text, return_tensors="pt").to(model.device)
-generated = model.generate(
-    **inputs,
-    max_new_tokens=512,
-    do_sample=True,
-    temperature=0.6,
-    top_p=0.95,
-    top_k=20,
-)
-output_ids = generated[0][inputs.input_ids.shape[1]:]
+  vLLM:
 
-# The reply contains a <think> ... </think> reasoning block followed by the answer.
-content = tokenizer.decode(output_ids, skip_special_tokens=True)
-print(content)
-```
+  ```bash
+  VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 vllm serve ornith-ai/Ornith-1.5-9B ... --hf-overrides '{"rope_scaling": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 262144}}' --max-model-len 1000000
+  ```
 
-To split the reasoning trace from the final answer, parse on the `</think>` marker:
+  SGLang:
 
-```python
-text = tokenizer.decode(output_ids, skip_special_tokens=True)
-if "</think>" in text:
-    reasoning, answer = text.split("</think>", 1)
-    reasoning = reasoning.replace("<think>", "").strip()
-    answer = answer.strip()
-else:
-    reasoning, answer = "", text.strip()
-```
+  ```bash
+  SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1 python -m sglang.launch_server ... --json-model-override-args '{"rope_scaling": {"rope_type": "yarn", "factor": 4.0, "original_max_position_embeddings": 262144}}' --context-length 1000000
+  ```
+
+<div style="border-left:4px solid #FD8E5B;background:rgba(253,142,91,0.1);border-radius:6px;padding:12px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;line-height:1.6">
+<div style="font-weight:700;color:#FD8E5B;margin-bottom:6px">📝 NOTE</div>
+<p style="margin:0">Open-source runtimes implement YaRN <i>statically</i>: the same scaling factor is applied to every request regardless of its length, which can slightly hurt quality on ordinary-length inputs. Only enable <code style="background:rgba(253,142,91,0.15);padding:1px 5px;border-radius:4px">rope_scaling</code> when your workload genuinely needs the longer window, and size <code style="background:rgba(253,142,91,0.15);padding:1px 5px;border-radius:4px">factor</code> to match it — the target window is roughly <code style="background:rgba(253,142,91,0.15);padding:1px 5px;border-radius:4px">factor</code> × 262,144, so if your requests top out around 524,288 tokens, <code style="background:rgba(253,142,91,0.15);padding:1px 5px;border-radius:4px">factor: 2.0</code> is the better setting.</p>
+</div>
 
 ### Using Ornith via the Chat Completions API
 
