@@ -3,7 +3,7 @@
 </div>
 <div align="center">
 
-[![Ornith Blog](https://img.shields.io/badge/%F0%9F%A6%A2%EF%B8%8F%20Ornith%20Blog%20-FD8E5B)](https://deep-reinforce.com/ornith.html)
+[![Ornith Blog](https://img.shields.io/badge/%F0%9F%A6%A2%EF%B8%8F%20Ornith%20Blog%20-FD8E5B)](https://deep-reinforce.com/ornith_1_0.html)
 
 </div>
 
@@ -11,8 +11,8 @@
 
 Aloha! 🌺 **Ornith** is a family of self-improving open-source models for agentic coding. This repo covers both generations:
 
-- 🦢 [**Ornith-1.5**](#ornith-15) *(latest)* — extends self-scaffolding into a complete end-to-end **self-improvement loop**: the model proposes new tasks, generates task-specific scaffolds, and produces solution rollouts for reinforcement learning. [Blog: From Self-Scaffolding to Self-Improvement](https://deep-reinforce.com/ornith_1_5.html)
-- 🦢 [**Ornith-1.0**](#ornith-10) — the original **self-scaffolding** release, which jointly optimizes the scaffold and the resulting solution rollouts. [Blog](https://deep-reinforce.com/ornith_1_0.html)
+- 🐦 [**Ornith-1.5**](#ornith-15) *(latest)* — extends self-scaffolding into a complete end-to-end **self-improvement loop**: the model proposes new tasks, generates task-specific scaffolds, and produces solution rollouts for reinforcement learning. More details can be found at [blog](https://ornith.ai/ornith_1_5.html). 
+- 🐦 [**Ornith-1.0**](#ornith-10) — the original **self-scaffolding** release, which jointly optimizes the scaffold and the resulting solution rollouts. More details can be found at [blog](https://ornith.ai/ornith_1_0.html)
 
 Both generations are **MIT licensed, globally accessible, and free from regional limitations**.
 
@@ -41,27 +41,6 @@ Each training cycle proceeds in three stages:
 
 Repeated over training, this creates a **closed self-improvement loop**: stronger policies enable the generation of harder and more informative tasks, evolving scaffolds discover better ways to elicit the model's capabilities, and higher-quality rollouts provide increasingly effective learning signals.
 
-### Task Reward
-
-For the *question → scaffold → rollout* setup, the task reward combines three signals — **validity, frontier difficulty, and novelty**. Let $q$ denote a generated question, $s$ its scaffold, and $\{\tau_i\}_{i=1}^{N}$ a set of solution rollouts:
-
-$$ R_{\text{task}} = \underbrace{V(q,s)}_{\text{Is it valid and verifiable?}} \times \underbrace{D\left(q,s,\{\tau_i\}_{i=1}^{N}\right)}_{\text{Is it at the right difficulty?}} \times \underbrace{N(q)}_{\text{Is it sufficiently novel?}} $$
-
-- **Validity & verifiability**: $V(q,s) \in [0,1]$ checks that the scaffold runs successfully, high-confidence solutions pass, clearly incorrect solutions fail, and the evaluation matches the task specification. Validity acts as a hard gate: $V(q,s)=0 \Rightarrow R_{\text{task}}=0$, preventing malformed tasks or unreliable scaffolds from being rewarded simply because they appear difficult.
-- **Frontier difficulty**: from $N$ rollouts we compute the empirical success rate $p = \frac{1}{N}\sum_{i=1}^{N}\mathbf{1}\left[s(q,\tau_i)=\text{success}\right]$ and reward tasks near a target frontier $p^*$: $D = \exp\left(-\frac{(p-p^*)^2}{2\sigma^2}\right)$ with $p^* = 0.2$ — challenging, but still yielding enough successful trajectories for RL. As the model improves, a task's reward naturally decreases, pushing the generator toward harder problems.
-- **Novelty & diversity**: $N(q) = 1 - \max_{q_j \in \mathcal{B}} \operatorname{sim}(q,q_j)$, where $\mathcal{B}$ is a buffer of previously generated or trained-on tasks. Novelty stays secondary to validity and difficulty: it reduces redundancy rather than rewarding arbitrarily unusual tasks.
-
-Because frontier difficulty is measured with the current model's own rollouts, the resulting curriculum **automatically evolves with model capability**.
-
-### Harness and Rollout Rewards
-
-For a generated question $q$, the harness $h$ is rewarded for providing an evaluation environment that is **aligned with the task, faithful to solution quality, and resistant to reward hacking**:
-
-$$ R_{\text{harness}} = \underbrace{C(q,h)}_{\text{Task alignment}} \times \underbrace{F\left(h,\{\tau_i\}\right)}_{\text{Reward fidelity}} \times \underbrace{H(h)}_{\text{Hack resistance}} $$
-
-Each rollout $\tau_i$ is scored directly by the generated harness, $R_{\text{rollout}}(\tau_i) = h(q,\tau_i)$ — a binary pass/fail reward for verifiable tasks, or a combination of correctness, task completion, efficiency, and constraint satisfaction for richer environments.
-
-**Question generation, harness generation, and solution rollouts are all optimized with GRPO** using their respective rewards, enabling the three stages to improve jointly within the same self-improvement loop.
 
 ## Ornith-1.5 Benchmarks
 
