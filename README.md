@@ -20,7 +20,6 @@ Aloha! 🌺 **Ornith** is a family of self-improving open-source models for agen
 
 Both generations are **MIT licensed, globally accessible, and free from regional limitations**.
 
----
 
 
 <img style="width: 100%; max-width: 900px;" src="assets/ornith_397b_eval.png" alt="Ornith 397B Benchmark Results" title="Ornith 397B Benchmark Results">
@@ -66,7 +65,7 @@ Both generations are **MIT licensed, globally accessible, and free from regional
 </table>
 </div>
 
-### 35B
+### 35B-A3B
 
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:100%;margin:0 auto;padding:16px 0">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px">
