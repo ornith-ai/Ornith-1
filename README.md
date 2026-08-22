@@ -251,7 +251,7 @@ python -m sglang.launch_server \
 
 #### For Long-Context
 
-Ornith-1.5-9B handles context windows of up to 262,144 tokens. When a task's combined input and output must go beyond this limit, we suggest extending the effective window with RoPE scaling — YaRN is the technique we validate against, and it is already built into both vLLM and SGLang. With a scaling factor of 4.0, the usable window grows to roughly 1M tokens.
+Ornith-1.5 and Ornith-1.0 series models handle context windows of up to 262,144 tokens. When a task's combined input and output must go beyond this limit, we suggest extending the effective window with RoPE scaling — YaRN is the technique we validate against, and it is already built into both vLLM and SGLang. With a scaling factor of 4.0, the usable window grows to roughly 1M tokens.
 
 You can turn YaRN on in either of two ways:
 
