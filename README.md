@@ -15,8 +15,8 @@
 
 Aloha! 🌺 **Ornith** is a family of self-improving open-source models for agentic coding. This repo covers both generations:
 
-- 🐦 [**Ornith-1.5**](#ornith-15) *(latest)* — extends self-scaffolding into a complete end-to-end **self-improvement loop**: the model proposes new tasks, generates task-specific scaffolds, and produces solution rollouts for reinforcement learning. More details can be found at [blog](https://ornith.ai/ornith_1_5.html).
-- 🐦 [**Ornith-1.0**](#ornith-10) — the first release, which jointly optimizes the scaffold and the resulting solution rollouts. More details can be found at [blog](https://ornith.ai/ornith_1_0.html).
+- 🐦 [**Ornith-1.5**](#ornith-15) *(latest)* — extends self-scaffolding into a complete end-to-end **self-improvement loop**: the model proposes new tasks, generates task-specific scaffolds, and produces solution rollouts for reinforcement learning. Model weights at [HuggingFace](https://huggingface.co/collections/ornith-ai/ornith-15), and more details can be found at [blog](https://ornith.ai/ornith_1_5.html).
+- 🐦 [**Ornith-1.0**](#ornith-10) — the first release, which jointly optimizes the scaffold and the resulting solution rollouts. Model weights at [HuggingFace](https://huggingface.co/collections/ornith-ai/ornith-10), and more details can be found at [blog](https://ornith.ai/ornith_1_0.html).
 
 Both generations are **MIT licensed, globally accessible, and free from regional limitations**.
 
@@ -66,7 +66,7 @@ Both generations are **MIT licensed, globally accessible, and free from regional
 </table>
 </div>
 
-### Ornith-35B
+### 35B
 
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:100%;margin:0 auto;padding:16px 0">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px">
@@ -104,7 +104,7 @@ Both generations are **MIT licensed, globally accessible, and free from regional
 </table>
 </div>
 
-### Ornith-9B
+### 9B
 
 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:100%;margin:0 auto;padding:16px 0">
 <table style="width:100%;table-layout:fixed;border-collapse:collapse;font-size:13px">
@@ -181,22 +181,22 @@ Both generations ship as a dense **9B** model plus two **Mixture-of-Experts** mo
 
 | Checkpoint | Architecture | Format | Best for |
 |---|---|---|---|
-| [Ornith-1.5-9B](https://huggingface.co/deepreinforce-ai/Ornith-1.5-9B) | Dense (~9B) | bf16 | Single-GPU serving & fine-tuning |
-| [Ornith-1.5-9B-Mobile](https://huggingface.co/deepreinforce-ai/Ornith-1.5-9B-Mobile) | Dense (~9B) | Quantized | On-device inference on iPhone / Android |
-| [Ornith-1.5-35B](https://huggingface.co/deepreinforce-ai/Ornith-1.5-35B) | MoE (35B-A3B) | bf16 | Full-precision multi-GPU serving |
-| [Ornith-1.5-397B](https://huggingface.co/deepreinforce-ai/Ornith-1.5-397B) | MoE (397B) | bf16 | Full-precision serving on a multi-GPU node |
+| [Ornith-1.5-9B](https://huggingface.co/ornith-ai/Ornith-1.5-9B) | Dense (~9B) | bf16 | Single-GPU serving & fine-tuning |
+| [Ornith-1.5-9B-Mobile](https://huggingface.co/ornith-ai/Ornith-1.5-9B-Mobile) | Dense (~9B) | Quantized | On-device inference on iPhone / Android |
+| [Ornith-1.5-35B](https://huggingface.co/ornith-ai/Ornith-1.5-35B) | MoE (35B-A3B) | bf16 | Full-precision multi-GPU serving |
+| [Ornith-1.5-397B](https://huggingface.co/ornith-ai/Ornith-1.5-397B) | MoE (397B) | bf16 | Full-precision serving on a multi-GPU node |
 
 **Ornith-1.0 checkpoints:**
 
 | Checkpoint | Architecture | Format | Best for |
 |---|---|---|---|
-| [Ornith-1.0-9B](https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B) | Dense (~9B) | bf16 | Single-GPU serving & fine-tuning |
-| [Ornith-1.0-9B-GGUF](https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B-GGUF) | Dense (~9B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
-| [Ornith-1.0-35B](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B) | MoE (35B) | bf16 | Full-precision multi-GPU serving |
-| [Ornith-1.0-35B-FP8](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B-FP8) | MoE (35B) | FP8 | ~Half the VRAM on FP8-capable GPUs |
-| [Ornith-1.0-35B-GGUF](https://huggingface.co/deepreinforce-ai/Ornith-1.0-35B-GGUF) | MoE (35B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
-| [Ornith-1.0-397B](https://huggingface.co/deepreinforce-ai/Ornith-1.0-397B) | MoE (397B) | bf16 | Full-precision serving on a multi-GPU node |
-| [Ornith-1.0-397B-FP8](https://huggingface.co/deepreinforce-ai/Ornith-1.0-397B-FP8) | MoE (397B) | FP8 | Memory-efficient serving on FP8-capable GPUs |
+| [Ornith-1.0-9B](https://huggingface.co/ornith-ai/Ornith-1.0-9B) | Dense (~9B) | bf16 | Single-GPU serving & fine-tuning |
+| [Ornith-1.0-9B-GGUF](https://huggingface.co/ornith-ai/Ornith-1.0-9B-GGUF) | Dense (~9B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
+| [Ornith-1.0-35B](https://huggingface.co/ornith-ai/Ornith-1.0-35B) | MoE (35B) | bf16 | Full-precision multi-GPU serving |
+| [Ornith-1.0-35B-FP8](https://huggingface.co/ornith-ai/Ornith-1.0-35B-FP8) | MoE (35B) | FP8 | ~Half the VRAM on FP8-capable GPUs |
+| [Ornith-1.0-35B-GGUF](https://huggingface.co/ornith-ai/Ornith-1.0-35B-GGUF) | MoE (35B) | GGUF (quantized) | Local inference via llama.cpp / Ollama |
+| [Ornith-1.0-397B](https://huggingface.co/ornith-ai/Ornith-1.0-397B) | MoE (397B) | bf16 | Full-precision serving on a multi-GPU node |
+| [Ornith-1.0-397B-FP8](https://huggingface.co/ornith-ai/Ornith-1.0-397B-FP8) | MoE (397B) | FP8 | Memory-efficient serving on FP8-capable GPUs |
 
 The recipes below stand up an OpenAI-compatible server under the shared alias `Ornith-1.5` (swap `1.5` for `1.0` everywhere to serve the previous generation). Set `MODEL` to the checkpoint you want, and match `--tensor-parallel-size` / `--tp` to your GPU count.
 
