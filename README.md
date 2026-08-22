@@ -13,7 +13,7 @@
 
 # Ornith
 
-Aloha! 🌺 **Ornith** is a family of self-improving open-source models for agentic coding. This repo covers both generations:
+Aloha! 🌺 **Ornith** is a family of self-improving open-source models for agentic tasks. This repo covers both generations:
 
 - 🐦 [**Ornith-1.5**](#ornith-15) *(latest)* — extends self-scaffolding into a complete end-to-end **self-improvement loop**: the model proposes new tasks, generates task-specific scaffolds, and produces solution rollouts for reinforcement learning. Model weights at [HuggingFace](https://huggingface.co/collections/ornith-ai/ornith-15), and more details can be found at [blog](https://ornith.ai/ornith_1_5.html).
 - 🐦 [**Ornith-1.0**](#ornith-10) — the first release, which jointly optimizes the scaffold and the resulting solution rollouts. Model weights at [HuggingFace](https://huggingface.co/collections/ornith-ai/ornith-10), and more details can be found at [blog](https://ornith.ai/ornith_1_0.html).
